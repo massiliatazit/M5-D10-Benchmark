@@ -59,17 +59,37 @@ movieRoute.post("/:id/upload",upload.single("image"),async(req,res,next)=>{
 movieRoute.post("/",async(req,res,next)=>{
     check("imdbID").exists().withMessage("imdbID is required").not().isEmpty()
     try{
-        let newMovie = {...req.body};
-    let movies = await getmovies(moviesPath)
+         let newMovie = {...req.body};
+    let movies = await getmovies()
+    console.log(movies)
     movies.push(newMovie)
-    await writemovies(movies)
+     await writemovies(movies)
     res.send("post movie")
     }catch(err){
         console.log(err),
         next(err)}
     })
+    movieRoute.post("/:mediaID", async (req, res, next) => {
+      try {
+        const movieDB = await getmovies();
+        const singleMovie = movieDB.findIndex(
+          (media) => media.imdbID === req.params.mediaID
+        );
+        if (singleMovie !== -1) {
+          movieDB[singleMovie] = req.body;
+          await writemovies(movieDB);
+          res.send("posted!");
+        } else {
+          console.log(error);
+          next(error);
+        }
+      } catch (error) {
+        console.log(error);
+        next(error);
+      }
+    });
 movieRoute.put("/:id",async(req,res,next)=>{
-   let movies = await getmovies(moviesPath)
+   let movies = await getmovies()
    let filteredmovie = movies.filter((movie)=>movie.imdbID !== req.params.id)
   
 
@@ -83,6 +103,71 @@ movieRoute.put("/:id",async(req,res,next)=>{
 
 
 })
+mediaRouter.post("/:mediaID/reviews", async (req, res, next) => {
+  try {
+    const movieDB = await getmovies();
+    const singleMediaIndex = movieDB.findIndex(
+      (media) => media.imdbID === req.params.mediaID
+    );
+    if (singleMediaIndex !== -1) {
+      if (movieDB[singleMediaIndex].hasOwnProperty("reviews")) {
+        movieDB[singleMediaIndex].reviews.push({
+          ...req.body,
+          _id: uniqid(),
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
+      } else {
+        movieDB[singleMediaIndex].reviews = [
+          {
+            ...req.body,
+            _id: uniqid(),
+            elementId: req.params.movieDB,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+        ];
+      }
+      await writemovies(movieDB);
+      res.send("Added!");
+    } else {
+      const err = new Error();
+      err.httpStatusCode = 404;
+      next(err);
+    }
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+});
+
+movieRoute.put("/:mediaID/reviews/:reviewID", async (req, res, next) => {
+  try {
+    const mediaDB = await getmovies();
+    const singleMediaIndex = mediaDB.findIndex(
+      (media) => media.imdbID === req.params.mediaID
+    );
+    if (singleMediaIndex !== -1) {
+      let selectedReview = mediaDB[singleMediaIndex].reviews.findIndex(
+        (review) => review._id === req.params.reviewID
+      );
+      mediaDB[singleMediaIndex].reviews[selectedReview] = {
+        ...mediaDB[singleMediaIndex].reviews[selectedReview],
+        ...req.body,
+        updatedAt: new Date(),
+      };
+      await writemovies(mediaDB);
+      res.send("updated!");
+    } else {
+      const err = new Error();
+      err.httpStatusCode = 404;
+      next(err);
+    }
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+});
 
 movieRoute.delete("/:id",async(req,res,next)=>{
   try{
