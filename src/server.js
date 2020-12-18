@@ -1,5 +1,5 @@
 const express = require("express");
-
+const reviewsRoutes = require("./reviews");
 const movieRoute = require("./media")
 const cors = require("cors");
 const {
@@ -16,6 +16,7 @@ const port = process.env.PORT||3001;
 server.use(cors());
 server.use(express.json());
 server.use("/movies",movieRoute)
+server.use("/reviews",reviewsRoutes)
 server.use(badRequestHandler) // error has to be after the route because it comes on next (in middlewares errors handling)
 server.use(notFoundHandler)
 
