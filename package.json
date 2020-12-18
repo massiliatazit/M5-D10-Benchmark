@@ -11,15 +11,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ASMahmood/firstPrivRepo.git"
+    "url": "git+https://github.com/massiliatazit/M5-D10-Benchmark.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/ASMahmood/firstPrivRepo/issues"
+    "url": "https://github.com/massiliatazit/M5-D10-Benchmark/issues"
   },
-  "homepage": "https://github.com/ASMahmood/firstPrivRepo#readme",
+  "homepage": "https://github.com/massiliatazit/M5-D10-Benchmark#readme",
   "dependencies": {
     "axios": "^0.21.0",
     "cloudinary": "^1.23.0",
